@@ -2,15 +2,17 @@
   "name": "loan-service",
   "version": "1.0.0",
   "description": "loan service engine prototype by Naufal Adi",
-  "main": "index.js",
+  "main": "index.ts",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "tsc && node dist/app.js",
+    "dev": "nodemon src/index.ts"
   },
   "author": "Naufal Adi Maheswara <adimaheswara99@gmail.com>",
   "license": "ISC",
   "dependencies": {
     "express": "^4.21.2",
     "pg": "^8.13.1",
+    "reflect-metadata": "^0.2.2",
     "typeorm": "^0.3.20"
   },
   "devDependencies": {
