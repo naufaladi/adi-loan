@@ -1,6 +1,16 @@
 import { AppDataSource } from "../config/database";
 import { Loan, LoanState, LoanStateEnum } from "../entities/Loan";
 
+const ALLOWED_TRANSITIONS: { [key: string]: LoanState[] } = {
+  proposed: ["approved"],
+  approved: ["invested"],
+  invested: ["disbursed"],
+};
+
+function canTransition(currentState: LoanState, newState: LoanState) {
+  return ALLOWED_TRANSITIONS[currentState]?.includes(newState);
+}
+
 export class LoanService {
   private db = AppDataSource.getRepository(Loan);
 
