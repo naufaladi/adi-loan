@@ -7,7 +7,6 @@
 node_modules
 *.log
 *.gz
-package-lock.json
 
 #others
 .env
