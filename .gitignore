@@ -1,0 +1,13 @@
+# OS
+.DS_Store*
+.directory
+*~
+
+# npm
+node_modules
+*.log
+*.gz
+package-lock.json
+
+#others
+.env
