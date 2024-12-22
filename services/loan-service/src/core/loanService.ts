@@ -1,51 +1,49 @@
 import { AppDataSource } from "../config/database";
-import { Loan, LoanState } from "../entities/Loan";
+import { Loan, LoanState, LoanStateEnum } from "../entities/Loan";
 
 export class LoanService {
-    private db = AppDataSource.getRepository(Loan);
+  private db = AppDataSource.getRepository(Loan);
 
-    async createLoan(data: Partial<Loan>) {
-        const loan = this.db.create({ ...data, state: "proposed" });
-        return this.db.save(loan);
-    }
+  async createLoan(data: Partial<Loan>) {
+    const loan = this.db.create({ ...data, state: "proposed" });
+    return this.db.save(loan);
+  }
 
-    async approveLoan(id: number, approvalProof: string) {
-        const loan = await this.db.findOneBy({ id });
-        if (!loan) throw new Error("Loan not found");
-        if (loan.state !== "proposed")
-            throw new Error("Loan cannot be approved");
+  async approveLoan(id: number, approvalProof: string) {
+    const loan = await this.db.findOneBy({ id });
+    if (!loan) throw new Error("Loan not found");
+    if (loan.state !== "proposed") throw new Error("Loan cannot be approved");
 
-        loan.state = "approved";
-        loan.approvalProof = approvalProof;
-        return this.db.save(loan);
-    }
+    loan.state = "approved";
+    loan.approvalProof = approvalProof;
+    return this.db.save(loan);
+  }
 
-    async investLoan(id: number, investmentAmount: number) {
-        const loan = await this.db.findOneBy({ id });
-        if (!loan) throw new Error("Loan not found");
-        if (loan.state !== "approved")
-            throw new Error("Loan cannot accept investments");
+  async investLoan(id: number, investmentAmount: number) {
+    const loan = await this.db.findOneBy({ id });
+    if (!loan) throw new Error("Loan not found");
+    if (loan.state !== "approved")
+      throw new Error("Loan cannot accept investments");
 
-        if (investmentAmount > loan.principal)
-            throw new Error("Investment exceeds loan principal");
+    if (investmentAmount > loan.principal)
+      throw new Error("Investment exceeds loan principal");
 
-        loan.state = "invested";
-        loan.investmentAmount = investmentAmount;
-        return this.db.save(loan);
-    }
+    loan.state = "invested";
+    loan.investmentAmount = investmentAmount;
+    return this.db.save(loan);
+  }
 
-    async disburseLoan(id: number) {
-        const loan = await this.db.findOneBy({ id });
-        if (!loan) throw new Error("Loan not found");
-        if (loan.state !== "invested")
-            throw new Error("Loan cannot be disbursed");
+  async disburseLoan(id: number) {
+    const loan = await this.db.findOneBy({ id });
+    if (!loan) throw new Error("Loan not found");
+    if (loan.state !== "invested") throw new Error("Loan cannot be disbursed");
 
-        loan.state = "disbursed";
-        loan.disbursementDate = new Date();
-        return this.db.save(loan);
-    }
+    loan.state = "disbursed";
+    loan.disbursementDate = new Date();
+    return this.db.save(loan);
+  }
 
-    async getLoans() {
-        return this.db.find();
-    }
+  async getLoans() {
+    return this.db.find();
+  }
 }
