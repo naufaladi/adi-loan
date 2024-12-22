@@ -4,8 +4,9 @@
   "description": "loan service engine prototype by Naufal Adi",
   "main": "app.ts",
   "scripts": {
-      "start": "tsc && node dist/app.js",
-      "dev": "nodemon src/app.ts"
+    "build": "tsc",
+    "start": "node dist/app.js",
+    "dev": "nodemon --watch src --exec ts-node src/app.ts"
   },
   "author": "Naufal Adi Maheswara <adimaheswara99@gmail.com>",
   "license": "ISC",

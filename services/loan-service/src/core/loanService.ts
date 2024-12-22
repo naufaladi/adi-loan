@@ -22,7 +22,8 @@ export class LoanService {
   async approveLoan(id: number, approvalProof: string) {
     const loan = await this.db.findOneBy({ id });
     if (!loan) throw new Error("Loan not found");
-    if (loan.state !== "proposed") throw new Error("Loan cannot be approved");
+    if (loan.state !== "proposed")
+      throw new Error("Loan cannot be approved haha");
 
     loan.state = "approved";
     loan.approvalProof = approvalProof;

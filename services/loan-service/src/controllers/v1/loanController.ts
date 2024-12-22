@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { LoanService } from "../../core/LoanService";
+import { LoanService } from "../../core/loanService";
 
 export class LoanController {
   private loanService = new LoanService();
