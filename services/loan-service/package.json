@@ -2,10 +2,10 @@
   "name": "loan-service",
   "version": "1.0.0",
   "description": "loan service engine prototype by Naufal Adi",
-  "main": "index.ts",
+  "main": "app.ts",
   "scripts": {
-    "start": "tsc && node dist/app.js",
-    "dev": "nodemon src/index.ts"
+      "start": "tsc && node dist/app.js",
+      "dev": "nodemon src/app.ts"
   },
   "author": "Naufal Adi Maheswara <adimaheswara99@gmail.com>",
   "license": "ISC",
