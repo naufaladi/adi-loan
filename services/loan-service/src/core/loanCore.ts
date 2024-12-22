@@ -11,7 +11,7 @@ function canTransition(currentState: LoanState, newState: LoanState) {
   return ALLOWED_TRANSITIONS[currentState]?.includes(newState);
 }
 
-export class LoanService {
+export class LoanCore {
   private db = AppDataSource.getRepository(Loan);
 
   async createLoan(data: Partial<Loan>) {

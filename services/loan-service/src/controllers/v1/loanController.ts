@@ -1,14 +1,14 @@
 import { Request, Response } from "express";
-import { LoanService } from "../../core/loanService";
+import { LoanCore } from "../../core/loanCore";
 
 export class LoanController {
-  private loanService = new LoanService();
+  private loan = new LoanCore();
 
   // TODO do some req validation
 
   async createLoan(req: Request, res: Response) {
     try {
-      const loan = await this.loanService.createLoan(req.body);
+      const loan = await this.loan.createLoan(req.body);
       res.status(201).json(loan);
     } catch (error) {
       res.status(400).json({ message: error.message });
@@ -17,7 +17,7 @@ export class LoanController {
 
   async approveLoan(req: Request, res: Response) {
     try {
-      const loan = await this.loanService.approveLoan(
+      const loan = await this.loan.approveLoan(
         +req.params.id,
         req.body.approvalProof
       );
@@ -29,7 +29,7 @@ export class LoanController {
 
   async investLoan(req: Request, res: Response) {
     try {
-      const loan = await this.loanService.investLoan(
+      const loan = await this.loan.investLoan(
         +req.params.id,
         req.body.investmentAmount
       );
@@ -41,7 +41,7 @@ export class LoanController {
 
   async disburseLoan(req: Request, res: Response) {
     try {
-      const loan = await this.loanService.disburseLoan(+req.params.id);
+      const loan = await this.loan.disburseLoan(+req.params.id);
       res.status(200).json(loan);
     } catch (error) {
       res.status(400).json({ message: error.message });
@@ -50,7 +50,7 @@ export class LoanController {
 
   async getLoans(req: Request, res: Response) {
     try {
-      const loans = await this.loanService.getLoans();
+      const loans = await this.loan.getLoans();
       res.status(200).json(loans);
     } catch (error) {
       res.status(500).json({ message: error.message });
