@@ -4,8 +4,6 @@ import { LoanCore } from "../../core/loanCore";
 export class LoanController {
   private loan = new LoanCore();
 
-  // TODO do some req validation
-
   async createLoan(req: Request, res: Response) {
     try {
       const loan = await this.loan.createLoan(req.body);
@@ -19,7 +17,9 @@ export class LoanController {
     try {
       const loan = await this.loan.approveLoan(
         +req.params.id,
-        req.body.approvalProof
+        req.body.approvalUrl,
+        +req.body.approvalEmployeeId,
+        req.body.approvalDate
       );
       res.status(200).json(loan);
     } catch (error) {
@@ -31,7 +31,8 @@ export class LoanController {
     try {
       const loan = await this.loan.investLoan(
         +req.params.id,
-        req.body.investmentAmount
+        req.body.investmentAmount,
+        +req.body.investorId
       );
       res.status(200).json(loan);
     } catch (error) {
@@ -41,7 +42,12 @@ export class LoanController {
 
   async disburseLoan(req: Request, res: Response) {
     try {
-      const loan = await this.loan.disburseLoan(+req.params.id);
+      const loan = await this.loan.disburseLoan(
+        +req.params.id,
+        req.body.agreementLetterUrl,
+        +req.body.disbursementEmployeeId,
+        req.body.disbursementDate
+      );
       res.status(200).json(loan);
     } catch (error) {
       res.status(400).json({ message: error.message });

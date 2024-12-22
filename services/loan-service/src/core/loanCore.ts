@@ -8,7 +8,11 @@ const ALLOWED_TRANSITIONS: { [key: string]: LoanState[] } = {
 };
 
 function canTransition(currentState: LoanState, newState: LoanState) {
-  return ALLOWED_TRANSITIONS[currentState]?.includes(newState);
+  if (!ALLOWED_TRANSITIONS[currentState]?.includes(newState)) {
+    throw new Error(
+      `${newState} state is not allowed from ${currentState} state ${ALLOWED_TRANSITIONS[currentState]}`
+    );
+  }
 }
 
 export class LoanCore {
@@ -19,38 +23,60 @@ export class LoanCore {
     return this.db.save(loan);
   }
 
-  async approveLoan(id: number, approvalProof: string) {
+  async approveLoan(
+    id: number,
+    approvalUrl: string,
+    approvalEmployeeId: number,
+    approvalDate: Date = new Date()
+  ) {
     const loan = await this.db.findOneBy({ id });
     if (!loan) throw new Error("Loan not found");
     if (loan.state !== "proposed")
-      throw new Error("Loan cannot be approved haha");
+      throw new Error(`Loan ${id} cannot be approved`);
 
     loan.state = "approved";
-    loan.approvalProof = approvalProof;
+    loan.approvalUrl = approvalUrl;
+    loan.approvalEmployeeId = approvalEmployeeId;
+    loan.approvalDate = new Date();
+
     return this.db.save(loan);
   }
 
-  async investLoan(id: number, investmentAmount: number) {
+  async investLoan(id: number, investmentAmount: number, investorId: number) {
     const loan = await this.db.findOneBy({ id });
     if (!loan) throw new Error("Loan not found");
     if (loan.state !== "approved")
-      throw new Error("Loan cannot accept investments");
+      throw new Error(`Loan ${id} cannot accept investments`);
 
-    if (investmentAmount > loan.principal)
-      throw new Error("Investment exceeds loan principal");
+    const newInvestedAmount = investmentAmount + loan.totalInvestedAmount;
+    if (newInvestedAmount > loan.principal) {
+      throw new Error(
+        `Would exceeds principal (${loan.principal}). Current invested: ${loan.totalInvestedAmount}`
+      );
+    }
 
-    loan.state = "invested";
-    loan.investmentAmount = investmentAmount;
+    loan.totalInvestedAmount = newInvestedAmount;
+    if (newInvestedAmount == loan.principal) {
+      loan.state = "invested";
+    }
     return this.db.save(loan);
   }
 
-  async disburseLoan(id: number) {
+  async disburseLoan(
+    id: number,
+    agreementLetterUrl: string,
+    disbursementEmployeeId: number,
+    disbursementDate: Date = new Date()
+  ) {
     const loan = await this.db.findOneBy({ id });
     if (!loan) throw new Error("Loan not found");
-    if (loan.state !== "invested") throw new Error("Loan cannot be disbursed");
+    if (loan.state !== "invested")
+      throw new Error(`Loan ${id} cannot be disbursed`);
 
     loan.state = "disbursed";
-    loan.disbursementDate = new Date();
+    loan.agreementLetterUrl = agreementLetterUrl;
+    loan.disbursementEmployeeId = disbursementEmployeeId;
+    loan.disbursementDate = disbursementDate;
     return this.db.save(loan);
   }
 
