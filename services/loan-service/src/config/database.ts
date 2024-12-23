@@ -1,5 +1,9 @@
 import { DataSource } from "typeorm";
 import { Loan } from "../entities/Loan";
+import { Investor } from "../entities/user/Investor";
+import { Borrower } from "../entities/user/Borrower";
+import { Investment } from "../entities/Investment";
+import { Employee } from "../entities/user/Employee";
 
 export const AppDataSource = new DataSource({
   type: "postgres",
@@ -10,18 +14,6 @@ export const AppDataSource = new DataSource({
   database: process.env.DB_NAME || "adi-loan",
   schema: "loan-service",
   synchronize: true,
-  logging: true,
-  entities: [Loan],
+  logging: false,
+  entities: [Loan, Investor, Borrower, Employee, Investment],
 });
-
-// export const createSchemaIfNotExists = async () => {
-//   const queryRunner = AppDataSource.createQueryRunner();
-//   try {
-//     await queryRunner.connect();
-//     await queryRunner.query(`CREATE SCHEMA IF NOT EXISTS "loan-service";`);
-//   } catch (error) {
-//     console.error("Error creating schema:", error);
-//   } finally {
-//     await queryRunner.release();
-//   }
-// };
