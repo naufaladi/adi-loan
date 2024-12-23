@@ -1,11 +1,8 @@
-import {
-  Column,
-  CreateDateColumn,
-  Entity,
-  PrimaryGeneratedColumn,
-  UpdateDateColumn,
-} from "typeorm";
+import { Column, Entity, ManyToOne, OneToMany } from "typeorm";
 import { Base } from "./Base";
+import { Investment } from "./Investment";
+import { Borrower } from "./user/Borrower";
+import { Employee } from "./user/Employee";
 
 export enum LoanStateEnum {
   PROPOSED = "proposed",
@@ -15,7 +12,7 @@ export enum LoanStateEnum {
 }
 export type LoanState = `${LoanStateEnum}`;
 
-@Entity("loans")
+@Entity()
 export class Loan extends Base {
   @Column({
     type: "enum",
@@ -24,13 +21,16 @@ export class Loan extends Base {
   })
   state: LoanState;
 
-  @Column()
-  borrowerId: number;
+  @ManyToOne(() => Borrower, (borrower) => borrower.loans)
+  borrower: Borrower;
 
-  @Column()
+  @OneToMany(() => Investment, (investment) => investment.loan)
+  investments: Investment[];
+
+  @Column({ default: 0 })
   totalInvestedAmount: number;
 
-  @Column()
+  @Column({ default: 0 })
   totalROI: number;
 
   @Column()
@@ -43,8 +43,8 @@ export class Loan extends Base {
   @Column({ nullable: true })
   approvalUrl?: string;
 
-  @Column({ nullable: true })
-  approvalEmployeeId?: number;
+  @ManyToOne(() => Employee, (employee) => employee.loansApproved)
+  approvalEmployee?: Employee;
 
   @Column({ type: "timestamp", nullable: true })
   approvalDate?: Date;
@@ -53,8 +53,8 @@ export class Loan extends Base {
   @Column({ nullable: true })
   agreementLetterUrl?: string;
 
-  @Column({ nullable: true })
-  disbursementEmployeeId?: number;
+  @ManyToOne(() => Employee, (employee) => employee.loansDisbursed)
+  disbursementEmployee?: Employee;
 
   @Column({ type: "timestamp", nullable: true })
   disbursementDate?: Date;
