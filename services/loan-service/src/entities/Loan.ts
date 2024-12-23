@@ -41,7 +41,7 @@ export class Loan extends Base {
 
   // Approval fields - TODO create a separate entity
   @Column({ nullable: true })
-  approvalUrl?: string;
+  approvalProofUrl?: string;
 
   @ManyToOne(() => Employee, (employee) => employee.loansApproved)
   approvalEmployee?: Employee;
