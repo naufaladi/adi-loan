@@ -2,6 +2,7 @@ import "reflect-metadata";
 import express, { ErrorRequestHandler, json } from "express";
 import { AppDataSource } from "./config/database";
 import router from "./routes";
+import { seedData } from "./utils/seedData";
 
 const app = express();
 const port = 5050;
@@ -22,7 +23,8 @@ app.use(errorHandler);
 
 // Database
 AppDataSource.initialize()
-  .then(() => {
+  .then(async () => {
+    await seedData();
     console.log("Database connected");
   })
   .catch((error) => {
