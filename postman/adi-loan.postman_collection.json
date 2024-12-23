@@ -1,0 +1,189 @@
+{
+	"info": {
+		"_postman_id": "37eccde1-03d3-493a-9b37-399cf1b0d441",
+		"name": "adi-loan",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "26704312"
+	},
+	"item": [
+		{
+			"name": "loan-service",
+			"item": [
+				{
+					"name": "loans",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/loans",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"loans"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "open loans",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/loans/open",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"loans",
+								"open"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "create loan",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"borrowerId\": 1,\n    \"principal\": 2000000,\n    \"interestRate\": 0.05\n}\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/loans",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"loans"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "approve loan",
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"approvalEmployeeId\": 1,\n    \"approvalProofUrl\": \"https://picsum.photos/id/1/200/300\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/loans/1/approve",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"loans",
+								"1",
+								"approve"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "invest loan",
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"investorId\": 3,\n    \"investmentAmount\": 1000000\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/loans/1/invest",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"loans",
+								"1",
+								"invest"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "disburse loan",
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"disbursementEmployeeId\": 1,\n    \"agreementLetterUrl\": \"https://picsum.photos/id/1/200/300\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/loans/1/disburse",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"loans",
+								"1",
+								"disburse"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "health-check",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{baseUrl}}/health-check",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"health-check"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
