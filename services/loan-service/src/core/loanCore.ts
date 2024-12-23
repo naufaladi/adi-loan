@@ -23,16 +23,6 @@ function canTransition(currentState: LoanState, newState: LoanState) {
   }
 }
 
-const transporter = nodemailer.createTransport({
-  host: "sandbox.smtp.mailtrap.io",
-  port: 587,
-  secure: false,
-  auth: {
-    user: "c89254894b03ac",
-    pass: "f87c374fa4e1e3",
-  },
-});
-
 export class LoanCore {
   private loanDb = AppDataSource.getRepository(Loan);
   private investorDb = AppDataSource.getRepository(Investor);
@@ -116,40 +106,58 @@ export class LoanCore {
   }
 
   async emailAgreementDoc(loan: Loan) {
-    const doc = new PDFDocument();
-    let pdfBuffer = Buffer.from([]);
+    if (!process.env.emailUser || !process.env.emailPass) return;
 
-    doc.on("data", (chunk: Uint8Array<ArrayBufferLike>) => {
-      pdfBuffer = Buffer.concat([pdfBuffer, chunk]);
-    });
-    doc.on("end", async () => {
-      loan.investments.forEach(async (investment) => {
-        await transporter.sendMail({
-          from: "test@gmail.com",
-          to: investment.investor.email,
-          subject: "Loan has been fully invested",
-          text: `Dear ${investment.investor.name}, your investment of IDR ${investment.amount} for loan ID ${loan.id} has been fully invested`,
-          attachments: [
-            {
-              filename: `loan-agreement-${loan.id}.pdf`,
-              content: pdfBuffer, // Attach the PDF
-            },
-          ],
-        });
-        console.log("email successfully sent to", investment.investor.email);
+    try {
+      const transporter = nodemailer.createTransport({
+        host: "sandbox.smtp.mailtrap.io",
+        port: 587,
+        secure: false,
+        auth: {
+          user: process.env.emailUser,
+          pass: process.env.emailPass,
+        },
       });
-    });
 
-    // Add content to the PDF
-    doc.fontSize(30).text("This is the agreement document", { align: "center" });
-    doc.moveDown();
-    doc
-      .fontSize(16)
-      .text(
-        `Generated for borrower ${loan.borrower.name} (loan id ${loan.id}), with principal ${loan.principal}`,
-        { align: "center" }
-      );
-    doc.end();
+      const doc = new PDFDocument();
+      let pdfBuffer = Buffer.from([]);
+
+      doc.on("data", (chunk: Uint8Array<ArrayBufferLike>) => {
+        pdfBuffer = Buffer.concat([pdfBuffer, chunk]);
+      });
+      doc.on("end", async () => {
+        console.log("3");
+        loan.investments.forEach(async (investment) => {
+          await transporter.sendMail({
+            from: "test@gmail.com",
+            to: investment.investor.email,
+            subject: "Loan has been fully invested",
+            text: `Dear ${investment.investor.name}, your investment of IDR ${investment.amount} for loan ID ${loan.id} has been fully invested`,
+            attachments: [
+              {
+                filename: `loan-agreement-${loan.id}.pdf`,
+                content: pdfBuffer, // Attach the PDF
+              },
+            ],
+          });
+          console.log("email successfully sent to", investment.investor.email);
+        });
+      });
+
+      // Add content to the PDF
+      doc.fontSize(30).text("This is the agreement document", { align: "center" });
+      doc.moveDown();
+      doc
+        .fontSize(16)
+        .text(
+          `Generated for borrower ${loan.borrower.name} (loan id ${loan.id}), with principal ${loan.principal}`,
+          { align: "center" }
+        );
+      doc.end();
+    } catch (error) {
+      console.log("error :>> ", error);
+      // do nothing
+    }
   }
 
   async disburseLoan(
