@@ -6,6 +6,8 @@ import { Employee } from "../entities/user/Employee";
 import { Investor } from "../entities/user/Investor";
 import PDFDocument from "pdfkit";
 import nodemailer from "nodemailer";
+import { FindManyOptions } from "typeorm";
+import { Disbursement } from "../entities/Disbursement";
 
 const ALLOWED_TRANSITIONS: { [key: string]: LoanState[] } = {
   proposed: ["approved"],
@@ -21,13 +23,15 @@ function canTransition(currentState: LoanState, newState: LoanState) {
   }
 }
 
-// const transporter = nodemailer.createTransport({
-//   service: "gmail",
-//   auth: {
-//     user: "naufaladi10@gmail.com",
-//     pass: "Googlemahes99.",
-//   },
-// });
+const transporter = nodemailer.createTransport({
+  host: "sandbox.smtp.mailtrap.io",
+  port: 587,
+  secure: false,
+  auth: {
+    user: "c89254894b03ac",
+    pass: "f87c374fa4e1e3",
+  },
+});
 
 export class LoanCore {
   private loanDb = AppDataSource.getRepository(Loan);
@@ -35,6 +39,7 @@ export class LoanCore {
   private employeeDb = AppDataSource.getRepository(Employee);
   private borrowerDb = AppDataSource.getRepository(Borrower);
   private investmentDb = AppDataSource.getRepository(Investment);
+  private disbursementDb = AppDataSource.getRepository(Disbursement);
 
   async createLoan(data: { borrowerId: number; principal: number; interestRate: number }) {
     const borrower = await this.borrowerDb.findOneBy({ id: data.borrowerId });
@@ -44,6 +49,7 @@ export class LoanCore {
       borrower,
       principal: data.principal,
       interestRate: data.interestRate,
+      totalROI: data.principal * data.interestRate,
       state: "proposed",
     });
     return this.loanDb.save(loan);
@@ -76,7 +82,7 @@ export class LoanCore {
   async investLoan(id: number, investmentAmount: number, investorId: number) {
     const loan = await this.loanDb.findOne({
       where: { id },
-      relations: { investments: true, borrower: true },
+      relations: { investments: { investor: true }, borrower: true },
     });
     const investor = await this.investorDb.findOne({ where: { id: investorId } });
 
@@ -117,21 +123,21 @@ export class LoanCore {
       pdfBuffer = Buffer.concat([pdfBuffer, chunk]);
     });
     doc.on("end", async () => {
-      // loan.investments.forEach(async (investment) => {
-      //   await transporter.sendMail({
-      //     from: '"Naufal Adi" <naufaladi10@gmail.com>',
-      //     to: investment.investor.email,
-      //     subject: "Loan has been fully invested",
-      //     text: `Dear ${investment.investor.name}, your investment of IDR ${investment.amount} has recently been fully invested`,
-      //     attachments: [
-      //       {
-      //         filename: `loan-agreement-${loan.id}.pdf`,
-      //         content: pdfBuffer, // Attach the PDF
-      //       },
-      //     ],
-      //   });
-      //   console.log("email successfully sent to", investment.investor.email);
-      // });
+      loan.investments.forEach(async (investment) => {
+        await transporter.sendMail({
+          from: "test@gmail.com",
+          to: investment.investor.email,
+          subject: "Loan has been fully invested",
+          text: `Dear ${investment.investor.name}, your investment of IDR ${investment.amount} for loan ID ${loan.id} has been fully invested`,
+          attachments: [
+            {
+              filename: `loan-agreement-${loan.id}.pdf`,
+              content: pdfBuffer, // Attach the PDF
+            },
+          ],
+        });
+        console.log("email successfully sent to", investment.investor.email);
+      });
     });
 
     // Add content to the PDF
@@ -155,21 +161,34 @@ export class LoanCore {
     const loan = await this.loanDb.findOneBy({ id });
     const employee = await this.employeeDb.findOne({
       where: { id: disbursementEmployeeId },
-      relations: { loansDisbursed: true },
     });
 
     if (!loan) throw new Error("Loan not found");
     if (!employee) throw new Error("Employee not found");
     canTransition(loan.state, "disbursed");
 
+    const disbursement = new Disbursement();
+    disbursement.agreementLetterUrl = agreementLetterUrl;
+    disbursement.disbursementDate = disbursementDate;
+    disbursement.employee = { id: employee.id } as Employee;
+    disbursement.loan = { id: loan.id } as Loan;
+    this.disbursementDb.save(disbursement);
+
     loan.state = "disbursed";
-    loan.agreementLetterUrl = agreementLetterUrl;
-    loan.disbursementEmployee = employee;
-    loan.disbursementDate = disbursementDate;
+    loan.disbursement = disbursement;
     return this.loanDb.save(loan);
   }
 
-  async getLoans() {
-    return this.loanDb.find();
+  async getLoans(options?: FindManyOptions<Loan>) {
+    return this.loanDb.find(options);
+  }
+
+  async getOpenLoans() {
+    const loans = await this.loanDb
+      .createQueryBuilder("loan")
+      .where("loan.totalInvestedAmount < loan.principal")
+      .andWhere("loan.approvalProofUrl IS NOT NULL")
+      .getMany();
+    return loans;
   }
 }

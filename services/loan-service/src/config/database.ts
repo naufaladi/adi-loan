@@ -4,6 +4,7 @@ import { Investor } from "../entities/user/Investor";
 import { Borrower } from "../entities/user/Borrower";
 import { Investment } from "../entities/Investment";
 import { Employee } from "../entities/user/Employee";
+import { Disbursement } from "../entities/Disbursement";
 
 export const AppDataSource = new DataSource({
   type: "postgres",
@@ -15,5 +16,5 @@ export const AppDataSource = new DataSource({
   schema: "loan-service",
   synchronize: true,
   logging: false,
-  entities: [Loan, Investor, Borrower, Employee, Investment],
+  entities: [Loan, Investor, Borrower, Employee, Investment, Disbursement],
 });

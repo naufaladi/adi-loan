@@ -1,8 +1,9 @@
-import { Column, Entity, ManyToOne, OneToMany } from "typeorm";
+import { Column, Entity, JoinColumn, ManyToOne, OneToMany, OneToOne } from "typeorm";
 import { Base } from "./Base";
 import { Investment } from "./Investment";
 import { Borrower } from "./user/Borrower";
 import { Employee } from "./user/Employee";
+import { Disbursement } from "./Disbursement";
 
 export enum LoanStateEnum {
   PROPOSED = "proposed",
@@ -36,10 +37,10 @@ export class Loan extends Base {
   @Column()
   principal: number;
 
-  @Column({ type: "decimal", precision: 5, scale: 2 })
+  @Column({ type: "decimal", precision: 5, scale: 4 }) // store as 0.15 rather than 15
   interestRate: number;
 
-  // Approval fields - TODO create a separate entity
+  // Approval fields - TODO create a separate entity if grows complex
   @Column({ nullable: true })
   approvalProofUrl?: string;
 
@@ -49,13 +50,7 @@ export class Loan extends Base {
   @Column({ type: "timestamp", nullable: true })
   approvalDate?: Date;
 
-  // Disbursement fields - TODO create a separate entity
-  @Column({ nullable: true })
-  agreementLetterUrl?: string;
-
-  @ManyToOne(() => Employee, (employee) => employee.loansDisbursed)
-  disbursementEmployee?: Employee;
-
-  @Column({ type: "timestamp", nullable: true })
-  disbursementDate?: Date;
+  @OneToOne(() => Disbursement, (disbursement) => disbursement.loan)
+  @JoinColumn()
+  disbursement?: Disbursement;
 }
