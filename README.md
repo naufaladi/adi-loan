@@ -4,12 +4,13 @@ This is my take on a showcase of a simple loan-service engine. Tech stack includ
 
 ## Get Started
 
-I recommend the use of Docker to run this app. This ensures consistency and compatibility accross different machines. it's so simple you only need one command to run, and it will install and initialize everything else needed to run the app:
+I highly recommend to use Docker to run this app. This ensures consistency and compatibility accross different machines. it's so simple you only need one command to run, and it will install and initialize everything:
 
 1. Start the app with: docker-compose up -d
 2. Open docker dashboard to monitor app container logs
 3. Create new connection in DBMS (e.g. dbeaver), see docker-compose.yml for connection config
-4. Done! You can now start developing
+4. Import collection from ./postman to Postman
+5. Done! You can now start using the app
 
 # Requirement - Loan Service (system design and abstraction)
 
@@ -33,6 +34,12 @@ We are building a loan engine. A loan can a multiple state: proposed , approved,
    ii. the employee id of the field officer that hands the money and/or collect the agreement letter
    iii. date of disbursement
 
-movement between state can only move forward, and a loan only need following information: - borrower id number - principal amount - rate, will define total interest that borrower will pay - ROI return of investment, will define total profit received by investors - link to the generated agreement letter
+movement between state can only move forward, and a loan only need following information:
+
+- borrower id number
+- principal amount
+- rate, will define total interest that borrower will pay
+- ROI return of investment, will define total profit received by investors
+- link to the generated agreement letter
 
 design a RESTFful api that satisfy above requirement.
