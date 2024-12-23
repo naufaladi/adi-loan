@@ -106,7 +106,10 @@ export class LoanCore {
   }
 
   async emailAgreementDoc(loan: Loan) {
-    if (!process.env.emailUser || !process.env.emailPass) return;
+    if (!process.env.emailUser || !process.env.emailPass) {
+      console.log("No valid authentication detected. Skipping emailAgreementDoc");
+      return;
+    }
 
     try {
       const transporter = nodemailer.createTransport({
