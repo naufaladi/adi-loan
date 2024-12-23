@@ -11,7 +11,9 @@ router.post("/", loan.createLoan);
 router.patch("/:id/approve", loan.approveLoan);
 router.patch("/:id/invest", loan.investLoan);
 router.patch("/:id/disburse", loan.disburseLoan);
+
 router.get("/", loan.getLoans);
+router.get("/open", loan.getOpenLoans);
 
 /**
  * TODO

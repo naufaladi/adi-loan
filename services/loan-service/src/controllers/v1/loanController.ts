@@ -57,8 +57,16 @@ export class LoanController {
 
   getLoans = async (req: Request, res: Response) => {
     try {
-      console.log("this :>> ", this);
       const loans = await this.loan.getLoans();
+      res.status(200).json(loans);
+    } catch (error) {
+      res.status(500).json({ message: error.message });
+    }
+  };
+
+  getOpenLoans = async (req: Request, res: Response) => {
+    try {
+      const loans = await this.loan.getOpenLoans();
       res.status(200).json(loans);
     } catch (error) {
       res.status(500).json({ message: error.message });
